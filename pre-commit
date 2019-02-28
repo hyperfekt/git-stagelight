@@ -2,7 +2,7 @@
 
 # git-stagelight
 # https://github.com/hyperfekt/git-stagelight
-# version 1.0.0
+# version 1.0.1
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,15 +21,18 @@ excludefile=".git/info/exclude"
 exec < /dev/tty
 
 function uniquedir {
+    local LC_ALL=C
     while read -d '' -r path; do
         if [[ -z "$prevcommon" ]]; then
             prevcommon="$path"
         else
             # number of common bytes, empty if one string is entirely contained within
-            local LC_ALL=C
-            set +e; cb=$(cmp <(printf "$prevcommon") <(printf "$path") 2>/dev/null); set -e; cb=${cb%,*}; cb=${cb##* }; cb=$(($cb-1))
+            cb=$(cmp <(printf "$prevcommon") <(printf "$path") 2>/dev/null)
+            # matches if strings diverge
             if [[ -n $cb ]]; then
+                cb=${cb%,*}; cb=${cb##* }; cb=$(($cb-1))
                 prefix="${prevcommon:0:$cb}"
+            # matches if one string is a prefix of the other
             else
                 # shorter paths are always provided first by git ls-files, so $prevcommon must be the prefix
                 prefix="$prevcommon"
