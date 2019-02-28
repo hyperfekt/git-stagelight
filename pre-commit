@@ -123,7 +123,7 @@ if [[ -n "$(stdbuf -oL git ls-files -o --exclude-standard --exclude-from="$previ
     prompt "$(uniquedir ".")"
     if command -v gdb >/dev/null; then
         readarray -td '' args < <(cat /proc/$PPID/cmdline | cut -d '' -f1 --complement)
-        /proc/$PPID/exe ${args[@]}
+        git ${args[@]}
         gdb --batch --eval-command "call (void)exit($?)" --pid $PPID >/dev/null 2>/dev/null
     else
         echo "gdb not found, repeat last command to commit"
