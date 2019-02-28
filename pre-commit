@@ -2,7 +2,7 @@
 
 # git-stagelight
 # https://github.com/hyperfekt/git-stagelight
-# version 1.0.1
+# version 1.0.2
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -83,7 +83,7 @@ function prompt {
         # leave enough space for ' █ contains: x...'
         truncate "$path" 17
         printf " "
-        if [[ -d "$path" ]]; then
+        if [[ -d "$path" && ! -L "$path" ]]; then
             tput sc
             printf "  contains: "
             truncate "$(cd "$path"; uniquedir  "." | tr '\n' ' ' | head -c $((4*$(tput cols))))"
