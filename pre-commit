@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+# git-stagelight
+# https://github.com/hyperfekt/git-stagelight
+# version 1.0.0
+
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+
+
+set -e
+
+# used to remember previously seen unstaged files
+previousfile=".git/info/stagelight"
+# git's local equivalent of .gitignore
+excludefile=".git/info/exclude"
+
+# gain access to stdin - git hooks aren't interactive by default
+exec < /dev/tty
+
+function uniquedir {
+    while read -d '' -r path; do
+        if [[ -z "$prevcommon" ]]; then
+            prevcommon="$path"
+        else
+            # number of common bytes, empty if one string is entirely contained within
+            local LC_ALL=C
+            set +e; cb=$(cmp <(printf "$prevcommon") <(printf "$path") 2>/dev/null); set -e; cb=${cb%,*}; cb=${cb##* }; cb=$(($cb-1))
+            if [[ -n $cb ]]; then
+                prefix="${prevcommon:0:$cb}"
+            else
+                # shorter paths are always provided first by git ls-files, so $prevcommon must be the prefix
+                prefix="$prevcommon"
+            fi
+            # if the prefix is the base path no common directory exists
+            if [[ "$prefix" == "$1" ]]; then
+                # output previously found most common path
+                echo "$prevcommon";
+                # start anew with full path
+                prevcommon="$path"
+            else
+                # if the last common byte is a slash, we already have a common directory
+                if [[ "${prefix: -1}" == "/" ]]; then
+                    prevcommon="$prefix"
+                else
+                    # check if no common directory exists
+                    if [[ -z "$prefix" || "$(dirname $prefix)" == "$1" ]]; then
+                        # output previously found most common path
+                        echo "$prevcommon";
+                        # start anew with full path
+                        prevcommon="$path"
+                    else
+                        # just discard anything up to the next parent directory
+                        prevcommon="$(dirname $prefix)/"
+                    fi
+                fi
+            fi
+        fi
+    done < <(stdbuf -oL git ls-files -o -z --exclude-standard --exclude-from="$previousfile" "$1")
+    echo "$prevcommon"
+}
+
+function truncate {
+    IFS=';' read -sdR -p $'\E[6n' ROW COL
+    termwidth=$(tput cols)
+    if [[ -z $2 ]]; then
+        buffer=0
+    else
+        buffer=$2
+    fi
+    length=$(($termwidth-$COL-$buffer))
+    printf "$1" | awk -v len="$length" '{ if (length($0) > len) printf substr($0, 1, len-3) "..."; else printf $0; }' -
+}
+
+function prompt {
+    IFS=$'\n'; for path in $1; do
+        tput civis
+        # leave enough space for ' █ contains: x...'
+        truncate "$path" 17
+        printf " "
+        if [[ -d "$path" ]]; then
+            tput sc
+            printf "  contains: "
+            truncate "$(cd "$path"; uniquedir  "." | tr '\n' ' ' | head -c $((4*$(tput cols))))"
+            tput rc
+        fi
+        tput cnorm
+        stty -echo
+        read -n 1 -r
+        stty echo
+        tput el
+        if [[ "$REPLY" == "s" ]]; then
+            git add "$path"
+            echo "staged."
+        elif [[ "$REPLY" == "o" ]]; then
+            echo "$path" >> "$previousfile"
+            echo "omitted."
+        elif [[ "$REPLY" == "e" ]]; then
+            echo "$path" >> "$excludefile"
+            echo "excluded."
+        elif [[ -z "$REPLY" && -d "$path" ]]; then
+            tput civis
+            printf "\r"
+            prompt "$(uniquedir "$path")"
+        else
+            tput civis
+            printf "\r"
+            prompt "$path"
+        fi
+    done
+}
+
+touch "$previousfile"
+touch "$excludefile"
+# wait for only one line, fast abort
+if [[ -n "$(stdbuf -oL git ls-files -o --exclude-standard --exclude-from="$previousfile" "." | head -n 1)" ]]; then
+    echo -e "New unstaged files (\e[4ms\e[0mtage, \e[4mo\e[0mmit, \e[4me\e[0mxclude, or ↵ to enter directory):"
+    prompt "$(uniquedir ".")"
+    if command -v gdb >/dev/null; then
+        readarray -td '' args < <(cat /proc/$PPID/cmdline | cut -d '' -f1 --complement)
+        /proc/$PPID/exe ${args[@]}
+        gdb --batch --eval-command "call (void)exit($?)" --pid $PPID >/dev/null 2>/dev/null
+    else
+        echo "gdb not found, repeat last command to commit"
+        exit 1
+    fi
+fi
