@@ -1,5 +1,8 @@
 # Changelog
 
+#### 1.0.3 - 2019-03-01
+Bugfix: Symlinked directories could be entered.
+
 #### 1.0.2 - 2019-02-28
 Bugfix: Symlinked directories were recursed into.
 
