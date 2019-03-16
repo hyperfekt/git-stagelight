@@ -2,7 +2,7 @@
 
 # git-stagelight
 # https://github.com/hyperfekt/git-stagelight
-# version 1.1.0
+# version 1.1.1
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,8 +17,8 @@ previousfile=".git/info/stagelight"
 # git's local equivalent of .gitignore
 excludefile=".git/info/exclude"
 
-# gain access to stdin - git hooks aren't interactive by default
-exec < /dev/tty
+# gain access to the terminal if we're being run interactively
+exec < /dev/tty || exit 0
 
 function print {
     printf "%s" "$1"

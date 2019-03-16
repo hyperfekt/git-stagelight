@@ -1,7 +1,7 @@
 { stdenv, makeWrapper, git, coreutils, ncurses, gdb, gawk }:
 stdenv.mkDerivation {
   pname = "git-stagelight";
-  version = "1.1.0";
+  version = "1.1.1";
   src = ./.;
   dontBuild = true;
   buildInputs = [ makeWrapper ];

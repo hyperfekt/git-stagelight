@@ -1,13 +1,17 @@
 # Changelog
 
+#### 1.1.1 2019-03-16
+Bugfix: Noninteractive commits would fail.
+
 ### 1.1.0 - 2019-03-15
-Enhancement: Commit on first try even without gdb (nonzero exit code remains).
-Enhancement: Much faster when dealing with many files.
+Enhancement: Commit on first try even without gdb (nonzero exit code remains).  
+Enhancement: Much faster when dealing with many files.  
 Enhancement: Contents of directories are listed asynchronously.
-Bugfix: Using just 'git commit' led to an error.
-Bugfix: There was a hidden dependency on 'cmp' from diffutils.
-Bugfix: Filenames with newlines could cause problems.
-Bugfix: Filenames added to the exclude or omit file weren't escaped.
+
+Bugfix: Using just 'git commit' led to an error.  
+Bugfix: There was a hidden dependency on 'cmp' from diffutils.  
+Bugfix: Filenames with newlines could cause problems.  
+Bugfix: Filenames added to the exclude or omit file weren't escaped.  
 Bugfix: Filenames added to the exclude or omit file weren't anchored to the root.
 
 #### 1.0.3 - 2019-03-01
