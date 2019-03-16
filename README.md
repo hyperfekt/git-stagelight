@@ -13,6 +13,5 @@ Save [pre-commit](pre-commit?raw=true) into the `.git/hooks/` directory of your 
 
 Optionally, add it to the [git template directory](https://git-scm.com/docs/git-init#_template_directory) to automatically install in every new repository.
 
-For the frictionless commit process shown above, **gdb needs to be installed**.  
-Otherwise you'll have to repeat the commit command once.  
-This is because git determines which changes to include in the commit before it calls the pre-commit hook.
+To get a nonzero exit code, gdb needs to be installed.  
+This is because normally a git hook has no control over the calling process.
