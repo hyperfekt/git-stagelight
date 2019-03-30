@@ -1,9 +1,10 @@
 # Changelog
-## Unreleased
+#### 1.2.1 2019-03-30
 Enhancement: No unnecessary delay if no new, unstaged files are present.  
 Enhancement: Increased performance of directory listing.
 
-Bugfix: Under certain conditions unstaged files were shown in multiple invocations instead of colected under one directory.
+Bugfix: Under certain conditions unstaged files were shown in multiple invocations instead of colected under one directory.  
+Bugfix: String arguments with spaces were not properly forwarded to git.
 
 ### 1.2.0 2019-03-30
 Enhancement: Compute contents of each directory only once instead of twice.  

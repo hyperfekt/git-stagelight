@@ -2,7 +2,7 @@
 
 # git-stagelight
 # https://github.com/hyperfekt/git-stagelight
-# version 1.2.0
+# version 1.2.1
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -209,8 +209,7 @@ if [[ -n "$(git ls-files -o --directory --no-empty-directory --exclude-standard 
     echo "New unstaged files ($(ul s)tage, $(ul o)mit, $(ul e)xclude, or ↵ to enter directory):"
     prompt 3< <(uniquedir)
     mapfile -td '' cmd < <(cat /proc/$PPID/cmdline)
-    eval "${cmd[@]}"
-    result=$?
+    "${cmd[0]}" "${cmd[@]:1}" && result=$? || result=$?
     if command -v gdb >/dev/null; then
         gdb --batch --eval-command "call (void)exit($result)" --pid $PPID >/dev/null 2>/dev/null
     else
