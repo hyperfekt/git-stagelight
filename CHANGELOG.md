@@ -1,4 +1,8 @@
 # Changelog
+#### 1.2.2 2019-3-30
+Bugfix: Job control messages could appear.  
+Bugfix: If mkfifo failed the script would continue.
+
 #### 1.2.1 2019-03-30
 Enhancement: No unnecessary delay if no new, unstaged files are present.  
 Enhancement: Increased performance of directory listing.

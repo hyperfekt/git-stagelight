@@ -2,7 +2,7 @@
 
 # git-stagelight
 # https://github.com/hyperfekt/git-stagelight
-# version 1.2.1
+# version 1.2.2
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -98,10 +98,8 @@ function list {
 }
 
 function discard {
-    kill $contains >/dev/null 2>/dev/null || true >/dev/null
-    wait $contains >/dev/null 2>/dev/null || true >/dev/null
-    kill -- -$contains >/dev/null 2>/dev/null || true >/dev/null
-    kill -- -$enter >/dev/null 2>/dev/null || true >/dev/null
+    kill $contains >/dev/null 2>/dev/null || true
+    wait $contains >/dev/null 2>/dev/null || true
 }
 
 function escape {
@@ -137,17 +135,17 @@ function prompt {
             tput cnorm
             contentsA=$(mktemp -u)
             contentsB=$(mktemp -u)
-            if mkfifo "$contentsA" && mkfifo "$contentsB"; then
-                (cd "$path"; uniquedir > >(tee "$contentsA" "$contentsB" >/dev/null) &)
-                enter=$!
-                exec 5<"$contentsA"
-                exec 6<"$contentsB"
-                rm "$contentsA"
-                rm "$contentsB"
-                list 3<&5 <&0 &
-                contains=$!
-                exec 5>&-
-            fi
+            mkfifo "$contentsA"
+            mkfifo "$contentsB"
+            (cd "$path"; uniquedir > >(tee "$contentsA" "$contentsB" >/dev/null) &)
+            enter=$!
+            exec 5<"$contentsA"
+            exec 6<"$contentsB"
+            rm "$contentsA"
+            rm "$contentsB"
+            (list 3<&5 <&0 &)
+            contains=$!
+            exec 5>&-
         else
             tput civis
             # leave enough space for ' excluded.'
@@ -184,9 +182,7 @@ function prompt {
                 fi
                 break
             elif [[ -z "$REPLY" && -d "$path" && ! -L "$path" ]]; then
-                kill $contains >/dev/null 2>/dev/null || true
-                wait $contains >/dev/null 2>/dev/null || true
-                kill -- -$contains >/dev/null 2>/dev/null || true
+                discard
                 tput el
                 tput civis
                 printf "\r"
