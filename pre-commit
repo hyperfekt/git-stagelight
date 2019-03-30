@@ -51,7 +51,8 @@ function uniquedir {
                 while [[ $i -lt $lencommon && "${prevcommon[$i]}" == "${components[$i]}" ]]; do
                     let i+=1
                 done
-                prevcommon="${prevcommon[@]:0:$i}"
+                prevcommon=()
+                prevcommon=${components[@]:0:$i}
                 lencommon=$i
             else
                 # output previously found most common path
