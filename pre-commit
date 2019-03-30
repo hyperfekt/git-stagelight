@@ -28,7 +28,7 @@ function descend {
     # git ls-files -o --directory shows only a directory only if all files in it or its subfolders are unstaged
     # ergo if there is more than one file in it, they are all unstaged, but if there is only one we should just show that instead
     if [[ -d "$1" && ! -L "$1" ]]; then
-        mapfile -d '' -t inner < <(stdbuf -oL git ls-files -o -z --directory --no-empty-directory --exclude-standard --exclude-from="$previousfile" "$1/" | head -z -n 2)
+        mapfile -d '' -t inner < <(git ls-files -o -z --directory --no-empty-directory --exclude-standard --exclude-from="$previousfile" "$1/")
         if [[ ${#inner[@]} -eq 1 ]]; then
             descend "${inner[0]}"
         else
@@ -61,7 +61,7 @@ function uniquedir {
                 lencommon=${#prevcommon[@]}
             fi
         fi
-    done < <(stdbuf -oL git ls-files -o -z --directory --no-empty-directory --exclude-standard --exclude-from="$previousfile" ".")
+    done < <(git ls-files -o -z --directory --no-empty-directory --exclude-standard --exclude-from="$previousfile" ".")
     IFS='/'; descend "${prevcommon[*]}"
 }
 
@@ -204,7 +204,7 @@ function ul {
 touch "$previousfile"
 touch "$excludefile"
 # wait for only one line, fast abort
-if [[ -n "$(stdbuf -oL git ls-files -o --directory --no-empty-directory --exclude-standard --exclude-from="$previousfile" "." | head -n 1)" ]]; then
+if [[ -n "$(git ls-files -o --directory --no-empty-directory --exclude-standard --exclude-from="$previousfile" ".")" ]]; then
     echo "New unstaged files ($(ul s)tage, $(ul o)mit, $(ul e)xclude, or ↵ to enter directory):"
     prompt 3< <(uniquedir)
     mapfile -td '' cmd < <(cat /proc/$PPID/cmdline)

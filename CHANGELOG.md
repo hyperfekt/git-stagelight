@@ -1,4 +1,8 @@
 # Changelog
+## Unreleased
+Enhancement: No unnecessary delay if no new, unstaged files are present.  
+Enhancement: Increased performance of directory listing.
+
 ### 1.2.0 2019-03-30
 Enhancement: Compute contents of each directory only once instead of twice.  
 Enhancement: Use named pipes instead of temporary files.
