@@ -1,4 +1,10 @@
 # Changelog
+### 1.2.0 2019-03-30
+Enhancement: Compute contents of each directory only once instead of twice.  
+Enhancement: Use named pipes instead of temporary files.
+
+Bugfix: Newlines were accepted for names (despite being unsuported by the format) and line returns weren't sufficiently escaped in the exclude or omit file.  
+Bugfix: Under certain conditions unstaged files and directory contents were wrong.
 
 #### 1.1.1 2019-03-16
 Bugfix: Noninteractive commits would fail.
